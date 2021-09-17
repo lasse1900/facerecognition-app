@@ -4,6 +4,7 @@ import Navigation from './Components/Navigation/Navigation';
 import Logo from './Components/Logo/Logo';
 import Rank from './Components/Rank/Rank';
 import ImageLinkForm from './Components/ImageLinkForm/ImageLinkForm';
+import FaceRecognition from './Components/FaceRecognition/FaceRecognition';
 import Particles from "react-tsparticles";
 import Clarifai from 'clarifai';
 
@@ -31,7 +32,7 @@ const particleOptions = {
       enable: true,
       outMode: "bounce",
       random: false,
-      speed: 2,
+      speed: 5,
       straight: false,
     },
     number: {
@@ -60,43 +61,45 @@ class App extends React.Component {
     super();
     this.state = {
       input: '',
+      imageUrl: ''
     }
   }
 
   onInputChange = (event) => {
-    console.log(event.target.value)
+    this.setState({input: event.target.value})
   }
 
-onButtonSubmit = () => {
-  console.log("click");
-  app.models
-    .predict(
-      Clarifai.FACE_DETECT_MODEL,
-      // THE JPG
-      "https://i.insider.com/5d321d4ea209d3146d650b4a?width=1100&format=jpeg&auto=webp"
-    )
-    .then((response) => {
-      console.log(response);
-    })
-    .catch((err) => {
-      console.log(err);
-    });
-};
+  onButtonSubmit = () => {
+    this.setState({ imageUrl: this.state.input })
+    app.models
+      .predict(
+        // Clarifai.FACE_DETECT_MODEL,
+        Clarifai.FACE_DETECT_MODEL,
+        // THE JPG
+        this.state.input
+      )
+      .then((response) => {
+        console.log(response.outputs[0].data.regions[0].region_info.bounding_box);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
 
-render() {
-  return (
-    <div className="App">
-      <Particles className='particles' params={particleOptions} />
-      <Navigation />
-      <Logo />
-      <Rank />
-      <ImageLinkForm
-        onInputChange={this.onInputChange}
-        onButtonSubmit={this.onButtonSubmit} />
-      {/*<FaceRecognition /> */}
-    </div>
-  )
-}
+  render() {
+    return (
+      <div className="App">
+        <Particles className='particles' params={particleOptions} />
+        <Navigation />
+        <Logo />
+        <Rank />
+        <ImageLinkForm
+          onInputChange={this.onInputChange}
+          onButtonSubmit={this.onButtonSubmit} />
+        <FaceRecognition imageUrl={this.state.imageUrl} />
+      </div>
+    )
+  }
 }
 
 export default App;
