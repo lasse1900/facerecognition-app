@@ -120,9 +120,27 @@ class App extends React.Component {
         // THE JPG
         this.state.input
       )
-      .then(response => this.displayFaceBox(this.calculateFaceLocation(response)))
-      .catch((err) => console.log(err));
-  };
+
+      .then(response => {
+        console.log('hi', response)
+        if (response) {
+          fetch('http://localhost:3000/image', {
+            method: 'put',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              id: this.state.user.id
+            })
+          })
+            .then(response => response.json())
+            .then(count => {
+              this.setState(Object.assign(this.state.user, { entries: count }))
+            })
+
+        }
+        this.displayFaceBox(this.calculateFaceLocation(response))
+      })
+      .catch(err => console.log(err));
+  }
 
   onRouteChange = (route) => {
     if (route === 'signout') {
