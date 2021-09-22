@@ -122,9 +122,7 @@ class App extends React.Component {
         // THE JPG
         this.state.input
       )
-
       .then(response => {
-        console.log('hi', response)
         if (response) {
           fetch('http://localhost:3000/image', {
             method: 'put',
