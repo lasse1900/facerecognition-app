@@ -5,8 +5,7 @@ const ImageLinkForm = ({ onInputChange, onButtonSubmit }) => {
   return (
     <div>
       <p className='f3'>
-        {'This App detects fases in your pictures, try e.g. this: '}
-        {'https://www.thestatesman.com/wp-content/uploads/2017/08/1493458748-beauty-face-517.jpg '}
+        {'This App detects faces in your pictures'}
       </p>
       <div className='center'>
         <div className='form center pa4 br3 shadow-5'>
