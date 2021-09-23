@@ -8,11 +8,7 @@ import Rank from './Components/Rank/Rank';
 import ImageLinkForm from './Components/ImageLinkForm/ImageLinkForm';
 import FaceRecognition from './Components/FaceRecognition/FaceRecognition';
 import Particles from "react-tsparticles";
-import Clarifai from 'clarifai';
-
-const app = new Clarifai.App({
-  apiKey: "780aa9f8b3fa4098aa967044b7caffba",
-});
+// import Clarifai from 'clarifai'; // moved Clarifai to server
 
 const particleOptions = {
   particles: {
@@ -63,7 +59,7 @@ const initialState = {
   imageUrl: '',
   box: {},
   route: 'signin',
-  isSignIn: false,
+  isSignedIn: false,
   user: {
     id: '',
     name: '',
@@ -114,14 +110,15 @@ class App extends React.Component {
   }
 
   onButtonSubmit = () => {
-    this.setState({ imageUrl: this.state.input })
-    app.models
-      .predict(
-        // Clarifai.FACE_DETECT_MODEL,
-        Clarifai.FACE_DETECT_MODEL,
-        // THE JPG
-        this.state.input
-      )
+    this.setState({ imageUrl: this.state.input });
+    fetch('http://localhost:3000/imageurl', {
+      method: 'post',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        input: this.state.input
+      })
+    })
+      .then(response => response.json())
       .then(response => {
         if (response) {
           fetch('http://localhost:3000/image', {
@@ -146,17 +143,17 @@ class App extends React.Component {
     if (route === 'signout') {
       this.setState(initialState)
     } else if (route === 'home') {
-      this.setState({ isSignIn: true })
+      this.setState({ isSignedIn: true })
     }
     this.setState({ route: route })
   }
 
   render() {
-    const { isSignIn, imageUrl, route, box } = this.state;
+    const { isSignedIn, imageUrl, route, box } = this.state;
     return (
       <div className="App">
         <Particles className='particles' params={particleOptions} />
-        <Navigation isSignedIn={isSignIn} onRouteChange={this.onRouteChange} />
+        <Navigation isSignedIn={isSignedIn} onRouteChange={this.onRouteChange} />
         {this.state.route === 'home'
           ? <div> <Logo />
             <Rank name={this.state.user.name} entries={this.state.user.entries} />
